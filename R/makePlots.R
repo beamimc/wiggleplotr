@@ -7,17 +7,32 @@ plotTranscriptStructure <- function(exons_df, limits = NA, connect_exons = TRUE,
     dplyr::arrange_('transcript_id', 'start') %>%
     dplyr::filter(row_number() == 1)
 
+  
+  
+  # Define default fill column
+  color_by <- "feature_type"
+  colors <- c("cds" = "#2c7bb6", "exon" = "#abd9e9")
+  
+  # If 'color' column exists, overwrite
+  if ("color_by" %in% colnames(exons_df)) {
+    color_by <- "color_by"
+    unique_colors <- unique(exons_df$color_by)
+    colors <- setNames(unique_colors, unique_colors)  # name = value
+  }
+  
   #Create a plot of transcript structure
   plot = ggplot(exons_df) + geom_blank()
   if(connect_exons){ #Print line connecting exons
-    plot = plot + geom_line(aes_(x = ~start, y = ~transcript_rank, group = ~transcript_rank, color = ~feature_type))
+    plot = plot + geom_line(aes(x = start, y = transcript_rank, 
+                                 group = transcript_rank, 
+                                 color = !!rlang::sym(color_by)))
   }
   plot = plot + 
-    geom_rect(aes_(xmin = ~start, 
-                   xmax = ~end, 
-                   ymax = ~transcript_rank + 0.25, 
-                   ymin = ~transcript_rank - 0.25, 
-                   fill = ~feature_type)) + 
+    geom_rect(aes(xmin = start, 
+                   xmax = end, 
+                   ymax = transcript_rank + 0.25, 
+                   ymin = transcript_rank - 0.25, 
+                   fill = !!rlang::sym(color_by))) + 
     theme_light() +
     theme(plot.margin=unit(c(0,1,1,1),"line"), 
           axis.title.y = element_blank(),
@@ -31,8 +46,8 @@ plotTranscriptStructure <- function(exons_df, limits = NA, connect_exons = TRUE,
     xlab(xlabel) +
     facet_grid(type~.) +
     scale_y_continuous(expand = c(0.2,0.15)) +
-    scale_fill_manual(values = c("#2c7bb6","#abd9e9")) + 
-    scale_colour_manual(values = c("#2c7bb6","#abd9e9"))
+    scale_fill_manual(values = colors) +
+    scale_colour_manual(values = colors)
   if(all(!is.na(limits))){
     plot = plot + scale_x_continuous(expand = c(0,0)) +
       coord_cartesian(xlim = limits)
