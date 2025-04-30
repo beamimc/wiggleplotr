@@ -13,7 +13,7 @@ plotTranscriptStructure <- function(exons_df, limits = NA, connect_exons = TRUE,
   color_by <- "feature_type"
   colors <- c("cds" = "#2c7bb6", "exon" = "#abd9e9")
   
-  # If 'color' column exists, overwrite
+  # If 'color_by' column exists, overwrite
   if ("color_by" %in% colnames(exons_df)) {
     color_by <- "color_by"
     unique_colors <- unique(exons_df$color_by)
