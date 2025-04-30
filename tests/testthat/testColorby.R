@@ -35,6 +35,8 @@ test_that("plotTranscripts colors transcripts using color_by column in transcrip
     color_by = c('lightgreen','#fdae61')
   )
   
-  wiggleplotr::plotTranscripts(grl, transcript_annotations = transcript_annotations)
   
+  expect_no_error({
+    wiggleplotr::plotTranscripts(grl, transcript_annotations = transcript_annotations)
+  })  
 })
